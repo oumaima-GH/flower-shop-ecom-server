@@ -1,0 +1,135 @@
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id        Int        @id @default(autoincrement())
+    username  String
+    email     String
+    password  String
+    role      Role       @default(Customer)
+    createdAt DateTime   @default(now())
+    updatedAt DateTime   @updatedAt
+    address   Address[]
+    review    Review[]
+    order     Order[]
+    cart      Cart[]
+    userInfo  UserInfo[]
+    payment   Payment[]
+    product   Product[]
+}
+
+model UserInfo {
+    id        Int      @id @default(autoincrement())
+    firstName String
+    lastName  String
+    phone     String
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Address {
+    id        Int      @id @default(autoincrement())
+    apartment String
+    street    String
+    city      String
+    zipCode   String
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Product {
+    id          Int         @id @default(autoincrement())
+    name        String
+    image       String
+    stock       Boolean
+    price       Float
+    description String
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    category    Category[]
+    Review      Review[]
+    cart        Cart[]
+    OrderItem   OrderItem[]
+    user        User        @relation(fields: [userId], references: [id])
+    userId      Int
+}
+
+model Category {
+    id        Int       @id @default(autoincrement())
+    name      String
+    product   Product[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+}
+
+model Review {
+    id        Int      @id @default(autoincrement())
+    comment   String
+    rating    Int
+    productId Int
+    product   Product  @relation(fields: [productId], references: [id])
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Order {
+    id           Int         @id @default(autoincrement())
+    orderDate    DateTime
+    total        Float
+    shippingDate DateTime
+    createdAt    DateTime    @default(now())
+    updatedAt    DateTime    @updatedAt
+    userId       Int
+    user         User        @relation(fields: [userId], references: [id])
+    OrderItem    OrderItem[]
+    Payment      Payment[]
+}
+
+model OrderItem {
+    id        Int     @id @default(autoincrement())
+    quantity  Int
+    price     Float
+    orderId   Int
+    order     Order   @relation(fields: [orderId], references: [id])
+    productId Int
+    product   Product @relation(fields: [productId], references: [id])
+}
+
+model Cart {
+    id        Int     @id @default(autoincrement())
+    quantity  Int
+    product   Product @relation(fields: [productId], references: [id])
+    productId Int
+    user      User    @relation(fields: [userId], references: [id])
+    userId    Int
+}
+
+model Payment {
+    id            Int      @id @default(autoincrement())
+    amount        Float
+    paymentDate   DateTime
+    paymentMethod String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    order         Order    @relation(fields: [orderId], references: [id])
+    orderId       Int
+    user          User     @relation(fields: [userId], references: [id])
+    userId        Int
+}
+
+enum Role {
+    Seller
+    Customer
+}
