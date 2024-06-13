@@ -1,10 +1,9 @@
-//Response Handler for success responses
-const handleSuccess = (res, data, statusCode = 200, message = "Success") => {
-    res.status(statusCode).json({
-      statusCode: statusCode || 200,
-      message,
+const handleSuccess = (res, data, message = "Success") => {
+  res.status(200).json({
+      status: "success",
       data,
-    });
-  };
-  
-  module.exports = { handleSuccess };
+      message
+  });
+};
+
+module.exports = { handleSuccess };

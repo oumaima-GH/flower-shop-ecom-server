@@ -1,7 +1,16 @@
 {
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "@prisma/client": "^5.15.0",
     "bcrypt": "^5.1.1",
+    "express-router": "^0.0.1",
     "jsonwebtoken": "^9.0.2",
     "node-modules": "^1.0.1",
     "nodemon": "^3.1.3"
@@ -10,3 +19,4 @@
     "prisma": "^5.15.0"
   }
 }
+
