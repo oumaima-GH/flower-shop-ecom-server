@@ -10,7 +10,7 @@ generator client {
 model User {
     id        Int        @id @default(autoincrement())
     username  String
-    email     String
+    email     String     @unique
     password  String
     role      Role       @default(Customer)
     createdAt DateTime   @default(now())
