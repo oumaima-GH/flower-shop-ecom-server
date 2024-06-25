@@ -37,7 +37,7 @@ const postProduct = async ({ name, description, price, image, stock, userId, cat
         
         return product;
     } catch (err) {
-        console.error("Error in postProduct:", err); 
+        // console.error("Error in postProduct:", err); 
         throw new ErrorHandler(500, 'Failed to create product');
     }
 }

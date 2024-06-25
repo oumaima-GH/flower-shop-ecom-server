@@ -47,7 +47,7 @@ const createProduct = async (req, res, next) => {
         handleSuccess(res, newProduct, 201, 'Product created');
         
     } catch (err) {
-        console.error("Error in createProduct:", err.message); 
+        // console.error("Error in createProduct:", err.message); 
         next(new ErrorHandler(500, err.message));
     }
 };
