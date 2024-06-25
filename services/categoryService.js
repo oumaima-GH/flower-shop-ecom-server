@@ -62,24 +62,31 @@ const putCategory = async (id, name) => {
 
 const deleteCategory = async (id) => {
     try {
-
         const existingCategory = await db.category.findUnique({
             where: { id: parseInt(id) }
         });
 
         if (!existingCategory) {
-            throw new ErrorHandler(404, 'Category not found');   }
+            throw new ErrorHandler(404, 'Category not found');
+        }
 
-       const deletedCategory = await db.category.delete({
+       
+        await db.product.deleteMany({
+            where: { categoryId: parseInt(id) }
+        });
+
+        
+        const deletedCategory = await db.category.delete({
             where: { id: parseInt(id) }
         });
+
         return deletedCategory;
-        
-     
     } catch (err) {
+        console.error("Error in deleteCategory:", err.message);
         throw new ErrorHandler(500, err.message);
     }
 }
+
 
 
 module.exports = {
