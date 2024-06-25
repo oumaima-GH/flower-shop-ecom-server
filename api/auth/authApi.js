@@ -44,7 +44,7 @@ const login = async (req, res, next) => {
         const user = await findUserByEmail(email);
 
         if (!user) {
-            return next(new ErrorHandler(400, 'Invalid credentials'));
+            return next(new ErrorHandler(400, 'User not found'));
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -53,14 +53,15 @@ const login = async (req, res, next) => {
             return next(new ErrorHandler(400, 'Invalid credentials'));
         }
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+        const token = jwt.sign({ id: user.id, username: user.username, email: user.email, role: user.role}, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
 
         handleSuccess(res, {
             token,
             user: {
                 id: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
         }, 200, 'Login successful');
     } catch (err) {
