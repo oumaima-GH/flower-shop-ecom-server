@@ -10,6 +10,7 @@ const reviewRouter = require('./routes/reviewRouter');
 // const cartRouter = require('./routes/cartRouter');
 const orderRouter = require('./routes/orderRouter');
 const orderItemRouter = require('./routes/orderItemRouter');
+const paymentRouter = require('./routes/paymentRouter');
 const app = express();
 
 app.use(express.json());
@@ -24,6 +25,7 @@ app.use('/api', reviewRouter);
 // app.use('/api', cartRouter);
 app.use('/api', orderRouter);
 app.use('/api', orderItemRouter);
+app.use('/api', paymentRouter);
 
 
 app.use((err, req, res, next) => {
