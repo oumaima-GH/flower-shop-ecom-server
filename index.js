@@ -6,6 +6,7 @@ const userInfoRouter = require('./routes/userInfoRouter');
 const categoryRouter = require('./routes/categoryRouter');
 const productRouter = require('./routes/productRouter');
 const addressRouter = require('./routes/addressRouter');
+const reviewRouter = require('./routes/reviewRouter');
 const app = express();
 
 app.use(express.json());
@@ -16,6 +17,7 @@ app.use('/api', userInfoRouter)
 app.use('/api', categoryRouter);
 app.use('/api', productRouter);
 app.use('/api', addressRouter);
+app.use('/api', reviewRouter);
 
 
 app.use((err, req, res, next) => {
