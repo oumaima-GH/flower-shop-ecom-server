@@ -7,6 +7,9 @@ const categoryRouter = require('./routes/categoryRouter');
 const productRouter = require('./routes/productRouter');
 const addressRouter = require('./routes/addressRouter');
 const reviewRouter = require('./routes/reviewRouter');
+// const cartRouter = require('./routes/cartRouter');
+const orderRouter = require('./routes/orderRouter');
+const orderItemRouter = require('./routes/orderItemRouter');
 const app = express();
 
 app.use(express.json());
@@ -18,6 +21,9 @@ app.use('/api', categoryRouter);
 app.use('/api', productRouter);
 app.use('/api', addressRouter);
 app.use('/api', reviewRouter);
+// app.use('/api', cartRouter);
+app.use('/api', orderRouter);
+app.use('/api', orderItemRouter);
 
 
 app.use((err, req, res, next) => {

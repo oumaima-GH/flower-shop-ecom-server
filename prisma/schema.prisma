@@ -102,6 +102,7 @@ model OrderItem {
     id        Int      @id @default(autoincrement())
     quantity  Int
     price     Float
+    subtotal  Float
     orderId   Int
     order     Order    @relation(fields: [orderId], references: [id])
     productId Int
