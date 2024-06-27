@@ -1,12 +1,14 @@
-const db = require('../prismaDb')
+const db = require('../prismaDb');
 const { ErrorHandler } = require('../utils/handleError');
 
 const getAllOrders = async () => {
     try {
         const orders = await db.order.findMany({
             include: {
-                user: true
-            }
+                user: true,
+                OrderItem: true,
+                Payment: true,
+            },
         });
         return orders;
     } catch (err) {
@@ -17,8 +19,12 @@ const getAllOrders = async () => {
 const getOrderById = async (id) => {
     try {
         const order = await db.order.findUnique({
-            where: { id: parseInt(id) }
-            
+            where: { id: parseInt(id) },
+            include: {
+                user: true,
+                OrderItem: true,
+                Payment: true,
+            },
         });
         return order;
     } catch (err) {
@@ -28,19 +34,21 @@ const getOrderById = async (id) => {
 
 const postOrder = async ({ userId, orderDate, shippingDate, total }) => {
     try {
-        // console.log("Inside postOrder - data:", { userId, orderDate, shippingDate, total });
-        
         const order = await db.order.create({
-            data: { userId, orderDate, shippingDate, total }
-            ,
-            include : {
-                user : true
-            }
+            data: {
+                userId,
+                orderDate,
+                shippingDate,
+                total,
+            },
+            include: {
+                user: true,
+                OrderItem: true,
+                Payment: true,
+            },
         });
-        
         return order;
     } catch (err) {
-        // console.error("Error in postOrder:", err); 
         throw new ErrorHandler(500, 'Failed to create order');
     }
 }
@@ -48,7 +56,7 @@ const postOrder = async ({ userId, orderDate, shippingDate, total }) => {
 const putOrder = async (id, userId, orderDate, shippingDate, total) => {
     try {
         const existingOrder = await db.order.findUnique({
-            where: { id: parseInt(id) }
+            where: { id: parseInt(id) },
         });
 
         if (!existingOrder) {
@@ -58,9 +66,11 @@ const putOrder = async (id, userId, orderDate, shippingDate, total) => {
         const order = await db.order.update({
             where: { id: parseInt(id) },
             data: { userId, orderDate, shippingDate, total },
-            include : {
-                user : true
-            }
+            include: {
+                user: true,
+                OrderItem: true,
+                Payment: true,
+            },
         });
 
         return order;
@@ -72,7 +82,11 @@ const putOrder = async (id, userId, orderDate, shippingDate, total) => {
 const deleteOrder = async (id) => {
     try {
         const order = await db.order.delete({
-            where: { id: parseInt(id) }
+            where: { id: parseInt(id) },
+            include: {
+                OrderItem: true,
+                Payment: true,
+            },
         });
         return order;
     } catch (err) {
