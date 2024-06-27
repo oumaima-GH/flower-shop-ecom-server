@@ -7,7 +7,7 @@ const getUsers = async (req, res, next) => {
     try {
         const users = await getAllUsers();
 
-        if (!users) {
+        if (!users || users.length === 0) {
             throw new ErrorHandler(404, 'No users found');
         }
 
@@ -15,7 +15,7 @@ const getUsers = async (req, res, next) => {
     } catch (err) {
         next(new ErrorHandler(500, err.message));
     }
-}
+};
 
 const getUser = async (req, res, next) => {
     try {
@@ -30,7 +30,7 @@ const getUser = async (req, res, next) => {
     } catch (err) {
         next(new ErrorHandler(500, err.message));
     }
-}
+};
 
 const createUser = async (req, res, next) => {
     try {
@@ -52,23 +52,39 @@ const createUser = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
     try {
-        const user = await putUser(req, res);
-        handleSuccess(res, user);
+        const { id } = req.params;
+        const { username, email, password, userInfo, address, review, order, cart, payment } = req.body;
+
+        const updateData = {
+            username,
+            email,
+            password,
+            userInfo,
+            address,
+            review,
+            order,
+            cart,
+            payment
+        };
+
+        const updatedUser = await putUser(req, res);
+
+        handleSuccess(res, updatedUser);
     } catch (err) {
         next(new ErrorHandler(500, err.message));
     }
-}
+};
 
 const removeUser = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        const user = await deleteUser(id);
+        const deletedUser = await deleteUser(id);
 
-        handleSuccess(res, user);
+        handleSuccess(res, deletedUser, 200, 'User deleted successfully');
     } catch (err) {
         next(new ErrorHandler(500, err.message));
     }
-}
+};
 
 module.exports = { getUsers, getUser, createUser, updateUser, removeUser };

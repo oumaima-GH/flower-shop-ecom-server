@@ -5,7 +5,14 @@ const bcrypt = require('bcrypt');
 const getAllUsers = async () => {
     try {
         const users = await db.user.findMany({
-            include: { userInfo: true },
+            include: {
+                userInfo: true,
+                address: true,
+                review: true,
+                order: true,
+                cart: true,
+                payment: true,
+            },
         });
         return users;
     } catch (err) {
@@ -17,7 +24,14 @@ const getUserById = async (id) => {
     try {
         const user = await db.user.findUnique({
             where: { id: parseInt(id) },
-            include: { userInfo: true },
+            include: {
+                userInfo: true,
+                address: true,
+                review: true,
+                order: true,
+                cart: true,
+                payment: true,
+            },
         });
         return user;
     } catch (err) {
@@ -50,11 +64,18 @@ const findUserByEmail = async (email) => {
 const putUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { username, email, password, userInfo } = req.body;
+        const { username, email, password, userInfo, address, review, order, cart, payment } = req.body;
 
         const existingUser = await db.user.findUnique({
             where: { id: parseInt(id) },
-            include: { userInfo: true }
+            include: {
+                userInfo: true,
+                address: true,
+                review: true,
+                order: true,
+                cart: true,
+                payment: true,
+            }
         });
 
         if (!existingUser) {
@@ -79,10 +100,34 @@ const putUser = async (req, res) => {
             }
         }
 
+        // Update related services
+        updateData.address = {
+            update: address
+        };
+        updateData.review = {
+            update: review
+        };
+        updateData.order = {
+            update: order
+        };
+        updateData.cart = {
+            update: cart
+        };
+        updateData.payment = {
+            update: payment
+        };
+
         const updatedUser = await db.user.update({
             where: { id: parseInt(id) },
             data: updateData,
-            include: { userInfo: true },
+            include: {
+                userInfo: true,
+                address: true,
+                review: true,
+                order: true,
+                cart: true,
+                payment: true,
+            },
         });
 
         return updatedUser;
@@ -102,9 +147,28 @@ const deleteUser = async (id) => {
             throw new Error('User not found');
         }
 
+        // Delete related services
+        await db.address.deleteMany({
+            where: { userId: parseInt(id) }
+        });
+        await db.review.deleteMany({
+            where: { userId: parseInt(id) }
+        });
+        await db.order.deleteMany({
+            where: { userId: parseInt(id) }
+        });
+        await db.cart.deleteMany({
+            where: { userId: parseInt(id) }
+        });
+        await db.payment.deleteMany({
+            where: { userId: parseInt(id) }
+        });
+
+        // Finally, delete the user
         await db.user.delete({
             where: { id: parseInt(id) }
         });
+
         return { message: 'User deleted successfully' };
     } catch (err) {
         throw new ErrorHandler(500, err.message);
