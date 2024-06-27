@@ -1,9 +1,17 @@
-const db = require('../prismaDb')
+const db = require('../prismaDb');
 const { ErrorHandler } = require('../utils/handleError');
 
 const getAllProducts = async () => {
     try {
-        const products = await db.product.findMany();
+        const products = await db.product.findMany({
+            include: {
+                cart: true,
+                review: true,
+                orderItem: true,
+                category: true,
+                user: true
+            }
+        });
         return products;
     } catch (err) {
         throw new ErrorHandler(500, err.message);
@@ -13,8 +21,14 @@ const getAllProducts = async () => {
 const getProductById = async (id) => {
     try {
         const product = await db.product.findUnique({
-            where: { id: parseInt(id) }
-            
+            where: { id: parseInt(id) },
+            include: {
+                cart: true,
+                review: true,
+                orderItem: true,
+                category: true,
+                user: true
+            }
         });
         return product;
     } catch (err) {
@@ -24,20 +38,16 @@ const getProductById = async (id) => {
 
 const postProduct = async ({ name, description, price, image, stock, userId, categoryId }) => {
     try {
-        // console.log("Inside postProduct - data:", { name, description, price, image, stock, userId, categoryId });
-        
         const product = await db.product.create({
-            data: { name, description, price, image, stock, userId, categoryId }
-            ,
-            include : {
-                category : true,
-                user : true
+            data: { name, description, price, image, stock, userId, categoryId },
+            include: {
+                category: true,
+                user: true
             }
         });
         
         return product;
     } catch (err) {
-        // console.error("Error in postProduct:", err); 
         throw new ErrorHandler(500, 'Failed to create product');
     }
 }
@@ -55,9 +65,9 @@ const putProduct = async (id, name, description, price, image, stock, categoryId
         const product = await db.product.update({
             where: { id: parseInt(id) },
             data: { name, description, price, image, stock, categoryId },
-            include : {
-                category : true,
-                user : true
+            include: {
+                category: true,
+                user: true
             }
         });
 
