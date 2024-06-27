@@ -42,7 +42,7 @@ model Address {
     city      String
     zipCode   String
     userId    Int
-    user      User     @relation(fields: [userId], references: [id])
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -79,7 +79,7 @@ model Review {
     rating    Int
     productId Int
     product   Product  @relation(fields: [productId], references: [id])
-    user      User     @relation(fields: [userId], references: [id])
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId    Int
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -93,7 +93,7 @@ model Order {
     createdAt    DateTime    @default(now())
     updatedAt    DateTime    @updatedAt
     userId       Int
-    user         User        @relation(fields: [userId], references: [id])
+    user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
     OrderItem    OrderItem[]
     Payment      Payment[]
 }
@@ -116,7 +116,7 @@ model Cart {
     quantity  Int
     product   Product  @relation(fields: [productId], references: [id])
     productId Int
-    user      User     @relation(fields: [userId], references: [id])
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId    Int
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -131,7 +131,7 @@ model Payment {
     updatedAt     DateTime @updatedAt
     order         Order    @relation(fields: [orderId], references: [id])
     orderId       Int
-    user          User     @relation(fields: [userId], references: [id])
+    user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId        Int
 }
 
