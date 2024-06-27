@@ -104,7 +104,7 @@ model OrderItem {
     price     Float
     subtotal  Float
     orderId   Int
-    order     Order    @relation(fields: [orderId], references: [id])
+    order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
     productId Int
     product   Product  @relation(fields: [productId], references: [id])
     createdAt DateTime @default(now())
@@ -129,7 +129,7 @@ model Payment {
     paymentMethod String
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
-    order         Order    @relation(fields: [orderId], references: [id])
+    order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
     orderId       Int
     user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId        Int
