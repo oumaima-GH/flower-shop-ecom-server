@@ -1,9 +1,12 @@
 const db = require('../prismaDb');
 const { ErrorHandler } = require('../utils/handleError');
+const bcrypt = require('bcrypt');
 
 const getAllUsers = async () => {
     try {
-        const users = await db.user.findMany();
+        const users = await db.user.findMany({
+            include: { userInfo: true },
+        });
         return users;
     } catch (err) {
         throw new ErrorHandler(500, err.message);
@@ -13,7 +16,8 @@ const getAllUsers = async () => {
 const getUserById = async (id) => {
     try {
         const user = await db.user.findUnique({
-            where: { id: parseInt(id) }
+            where: { id: parseInt(id) },
+            include: { userInfo: true },
         });
         return user;
     } catch (err) {
@@ -46,26 +50,47 @@ const findUserByEmail = async (email) => {
 const putUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { username, email } = req.body;
+        const { username, email, password, userInfo } = req.body;
 
         const existingUser = await db.user.findUnique({
-            where: { id: parseInt(id) }
+            where: { id: parseInt(id) },
+            include: { userInfo: true }
         });
 
         if (!existingUser) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        const user = await db.user.update({
+        const updateData = {};
+        if (username) updateData.username = username;
+        if (email) updateData.email = email;
+        if (password) updateData.password = await bcrypt.hash(password, 10);
+
+        if (userInfo) {
+            const userInfoUpdateData = {};
+            if (userInfo.firstName) userInfoUpdateData.firstName = userInfo.firstName;
+            if (userInfo.lastName) userInfoUpdateData.lastName = userInfo.lastName;
+            if (userInfo.phone) userInfoUpdateData.phone = userInfo.phone;
+
+            if (Object.keys(userInfoUpdateData).length > 0) {
+                updateData.userInfo = {
+                    update: userInfoUpdateData
+                };
+            }
+        }
+
+        const updatedUser = await db.user.update({
             where: { id: parseInt(id) },
-            data: { username, email }
+            data: updateData,
+            include: { userInfo: true },
         });
 
-        res.status(200).json(user);
+        return updatedUser;
     } catch (err) {
-        res.status(500).json({ message: 'Failed to update user' });
+        throw new ErrorHandler(500, err.message);
     }
 };
+
 
 const deleteUser = async (id) => {
     try {
@@ -77,7 +102,9 @@ const deleteUser = async (id) => {
             throw new Error('User not found');
         }
 
-        await db.user.delete({ where: { id: parseInt(id) } });
+        await db.user.delete({
+            where: { id: parseInt(id) }
+        });
         return { message: 'User deleted successfully' };
     } catch (err) {
         throw new ErrorHandler(500, err.message);

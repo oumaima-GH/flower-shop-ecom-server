@@ -13,8 +13,8 @@ const getAllUserInfo = async () => {
 const getUserInfoById = async (id) => {
     try {
         const user = await db.userInfo.findUnique({
-            where: { id: parseInt(id) },
-            // include: { userInfo: true }
+            where: { id: parseInt(id) }
+            // include: { user: true }
         });
         return user;
     } catch (err) {
