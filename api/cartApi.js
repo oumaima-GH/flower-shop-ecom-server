@@ -1,58 +1,88 @@
-// const { ErrorHandler, handleError } = require('../utils/handleError');
-// const { handleSuccess } = require('../utils/handleSuccess');
+const { ErrorHandler, handleError } = require('../utils/handleError');
+const { handleSuccess } = require('../utils/handleSuccess');
 
-// const { getCarts, postCart } = require('../services/cartService');
-// const { getProductById, putProduct } = require('../services/productService');
+const { fetchCarts, addProductToCart, deleteProductFromCart, updateProductInCart, clearCart } = require('../services/cartService');
 
-// const getCarts = async (req, res, next) => {
-//     try {
-//         const { userId, cartId } = req.params;
-//         const carts = await getCarts(userId, cartId);
+const getCarts = async (req, res, next) => {
+    try {
+        const { cartId } = req.params;
+        const userId = req.user.id;
 
-//         if (!carts) {
-//             throw new ErrorHandler(404, 'Cart is empty');
-//         }
+        const carts = await fetchCarts(userId, cartId);
 
-//         handleSuccess(res, carts);
-//     } catch (err) {
-//         next(new ErrorHandler(500, err.message));
-//     }
-// }
+        if (!carts || carts.length === 0) {
+            throw new ErrorHandler(404, 'Cart is empty');
+        }
 
-// const createCart = async (req, res, next) => {
-//     try {
-//         const { productId, quantity } = req.body;
-//         const userId = req.user.id; 
-
-//         if (!productId || !quantity) {
-//             return res.status(400).json({ message: 'Please provide all required fields' });
-//         }
-
-//         if (quantity <= 0) {
-//             return next(new ErrorHandler(400, "Quantity must be greater than 0"));
-//         }
-
-//         const product = await getProductById(productId);
-
-//         if (!product) {
-//             return next(new ErrorHandler(404, "Product not found"));
-//         }
-
-//         if (product.stock < quantity) {
-//             return next(new ErrorHandler(400, `Insufficient stock, available: ${product.stock}`));
-//         }
-
-//         const newCart = await postCart({ userId, productId, quantity });
-//         const newStock = product.stock - quantity;
-//         await putProduct(productId, { stock: newStock });
-
-//         handleSuccess(res, newCart, 201, 'Cart created');
-//     } catch (err) {
-//         next(new ErrorHandler(500, err.message));
-//     }
-// };
-
-// module.exports = { createCart };
+        handleSuccess(res, carts, 200, 'Carts retrieved');
+    } catch (err) {
+        next(new ErrorHandler(500, err.message));
+    }
+};
 
 
-// module.exports = { getCarts, createCart };
+const addProduct = async (req, res, next) => {
+    try {
+        const { productId, quantity } = req.body;
+        const userId = req.user.id;
+
+        if (!productId || !quantity) {
+            return res.status(400).json({ message: 'Please provide productId and quantity' });
+        }
+
+        await addProductToCart(userId, productId, quantity);
+
+        handleSuccess(res, 201, 'Product added to cart');
+    } catch (err) {
+        next(new ErrorHandler(500, err.message));
+    }
+};
+
+const deleteProduct = async (req, res, next) => {
+    try {
+        const { productId } = req.body;
+        const userId = req.user.id;
+
+        if (!productId) {
+            return res.status(400).json({ message: 'Please provide productId' });
+        }
+
+        await deleteProductFromCart(userId, productId);
+
+        handleSuccess(res, 200, 'Product deleted from cart');
+    } catch (err) {
+        next(new ErrorHandler(500, err.message));
+    }
+}
+
+const updateProduct = async (req, res, next) => {
+    try {
+        const { productId, quantity } = req.body;
+        const userId = req.user.id;
+
+        if (!productId || quantity === undefined) {
+            return res.status(400).json({ message: 'Specify product and quantity' });
+        }
+
+        await updateProductInCart(userId, productId, quantity);
+
+        handleSuccess(res, 200, 'Product updated in cart');
+    } catch (err) {
+        console.log("Error in updateProduct:", err.message);
+        next(new ErrorHandler(500, err.message));
+    }
+}
+
+const clear = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+
+        await clearCart(userId);
+
+        handleSuccess(res, 200, 'Cart cleared');
+    } catch (err) {
+        next(new ErrorHandler(500, err.message));
+    }
+}
+
+module.exports = { getCarts, addProduct, deleteProduct, updateProduct, clear };
