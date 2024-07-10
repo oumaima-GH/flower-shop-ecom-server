@@ -34,23 +34,32 @@ const getProduct = async (req, res, next) => {
 
 const createProduct = async (req, res, next) => {
     try {
-        const { name, description, price, image, stock, categoryId  } = req.body;
+        const { name, description, price, stock, categoryId } = req.body;
+        const image = req.file ? req.file.path : null; 
         const userId = +req.user.id;
-        // console.log("Request body in createProduct:", req.body)
+        console.log(req.body);
+        console.log(req.file);
 
-        if (!name || !description || !price || !image || !stock || !categoryId) {
+        if (!name || !description || !price || !stock || !categoryId || !image) {
             return res.status(400).json({ message: 'Please provide all required fields' });
         }
 
-        const newProduct = await postProduct({ name, description, price, image, stock, userId, categoryId });
+        const newProduct = await postProduct({ 
+            name, 
+            description, 
+            price, 
+            image, 
+            stock, 
+            userId, 
+            categoryId 
+        });
 
         handleSuccess(res, newProduct, 201, 'Product created');
-        
     } catch (err) {
-        // console.error("Error in createProduct:", err.message); 
         next(new ErrorHandler(500, err.message));
     }
 };
+
 
 
 const updateProduct = async (req, res, next) => {

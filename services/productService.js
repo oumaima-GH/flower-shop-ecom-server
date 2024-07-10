@@ -39,7 +39,7 @@ const getProductById = async (id) => {
 const postProduct = async ({ name, description, price, image, stock, userId, categoryId }) => {
     try {
         const product = await db.product.create({
-            data: { name, description, price, image, stock, userId, categoryId },
+            data: { name, description, price, image: image.path, stock, userId, categoryId },
             include: {
                 category: true,
                 user: true
@@ -64,7 +64,7 @@ const putProduct = async (id, name, description, price, image, stock, categoryId
 
         const product = await db.product.update({
             where: { id: parseInt(id) },
-            data: { name, description, price, image, stock, categoryId },
+            data: { name, description, price, image: image.path, stock, categoryId },
             include: {
                 category: true,
                 user: true
