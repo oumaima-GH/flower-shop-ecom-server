@@ -35,30 +35,38 @@ const getProduct = async (req, res, next) => {
 const createProduct = async (req, res, next) => {
     try {
         const { name, description, price, stock, categoryId } = req.body;
-        const image = req.file ? req.file.path : null; 
+        const image = req.file ? req.file.path.replace(/\\/g, '/') : null;
         const userId = +req.user.id;
-        console.log(req.body);
-        console.log(req.file);
+
+        console.log('Request Body:', req.body);
+        console.log('Uploaded File:', req.file);
 
         if (!name || !description || !price || !stock || !categoryId || !image) {
+            console.error('Missing required fields:', { name, description, price, stock, categoryId, image });
             return res.status(400).json({ message: 'Please provide all required fields' });
         }
+
+        const parsedPrice = parseFloat(price);
+        const parsedStock = parseInt(stock, 10);
+        const parsedCategoryId = parseInt(categoryId, 10);
 
         const newProduct = await postProduct({ 
             name, 
             description, 
-            price, 
+            price: parsedPrice, 
             image, 
-            stock, 
+            stock: parsedStock, 
             userId, 
-            categoryId 
+            categoryId: parsedCategoryId 
         });
 
         handleSuccess(res, newProduct, 201, 'Product created');
     } catch (err) {
+        console.error('Error in createProduct:', err.message);
         next(new ErrorHandler(500, err.message));
     }
 };
+
 
 
 

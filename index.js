@@ -11,9 +11,12 @@ const cartRouter = require('./routes/cartRouter');
 const orderRouter = require('./routes/orderRouter');
 const orderItemRouter = require('./routes/orderItemRouter');
 const paymentRouter = require('./routes/paymentRouter');
+const path = require('path');
 const app = express();
 
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 app.use('/api', authRouter)
 app.use('/api', userRouter);

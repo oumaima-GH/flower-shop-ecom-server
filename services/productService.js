@@ -36,10 +36,10 @@ const getProductById = async (id) => {
     }
 }
 
-const postProduct = async ({ name, description, price, image, stock, userId, categoryId }) => {
+const postProduct = async ({ name, description, price, image , stock, userId, categoryId }) => {
     try {
         const product = await db.product.create({
-            data: { name, description, price, image: image.path, stock, userId, categoryId },
+            data: { name, description, price, image, stock, userId, categoryId },
             include: {
                 category: true,
                 user: true
@@ -48,6 +48,7 @@ const postProduct = async ({ name, description, price, image, stock, userId, cat
         
         return product;
     } catch (err) {
+        console.log('Error creating product:', err.message);
         throw new ErrorHandler(500, 'Failed to create product');
     }
 }
