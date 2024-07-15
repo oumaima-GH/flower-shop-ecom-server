@@ -4,7 +4,8 @@ const {
     getProducts,
     createProduct,
     updateProduct,
-    removeProduct
+    removeProduct,
+    uploadImage
 } = require('../api/productApi');
 
 const { isAuthenticated, isAuthorized } = require('../middleware/authMiddleware');
@@ -15,5 +16,6 @@ router.get('/products/:id', getProduct);
 router.post('/products', isAuthenticated, isAuthorized('Seller'), upload.single('image'), createProduct);
 router.put('/products/:id', isAuthenticated, isAuthorized('Seller'), upload.single('image'), updateProduct);
 router.delete('/products/:id', isAuthenticated, isAuthorized('Seller'), removeProduct);
+router.post('/uploads', upload.single('image'), uploadImage);
 
 module.exports = router;

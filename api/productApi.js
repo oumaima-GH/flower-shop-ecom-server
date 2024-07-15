@@ -1,7 +1,6 @@
 const { ErrorHandler, handleError } = require('../utils/handleError');
 const { handleSuccess } = require('../utils/handleSuccess');
-
-const {getAllProducts, getProductById, postProduct, putProduct, deleteProduct} = require('../services/productService');
+const { getAllProducts, getProductById, postProduct, putProduct, deleteProduct } = require('../services/productService');
 
 const getProducts = async (req, res, next) => {
     try {
@@ -15,7 +14,7 @@ const getProducts = async (req, res, next) => {
     } catch (err) {
         next(new ErrorHandler(500, err.message));
     }
-}
+};
 
 const getProduct = async (req, res, next) => {
     try {
@@ -30,19 +29,23 @@ const getProduct = async (req, res, next) => {
     } catch (err) {
         next(new ErrorHandler(500, err.message));
     }
-}
+};
 
 const createProduct = async (req, res, next) => {
     try {
         const { name, description, price, stock, categoryId } = req.body;
         const image = req.file ? req.file.path.replace(/\\/g, '/') : null;
-        const userId = +req.user.id;
+        const baseURL = "http://127.0.0.1:3000/uploads/";
+        const fileName = image.split('\\').pop().split('/').pop();
+        const newImage = baseURL + fileName;
 
+        const userId = +req.user.id;
+        console.log("==========================>",newImage)
         console.log('Request Body:', req.body);
         console.log('Uploaded File:', req.file);
 
-        if (!name || !description || !price || !stock || !categoryId || !image) {
-            console.error('Missing required fields:', { name, description, price, stock, categoryId, image });
+        if (!name || !description || !price || !stock || !categoryId || !newImage) {
+            console.error('Missing required fields:', { name, description, price, stock, categoryId, newImage });
             return res.status(400).json({ message: 'Please provide all required fields' });
         }
 
@@ -54,7 +57,7 @@ const createProduct = async (req, res, next) => {
             name, 
             description, 
             price: parsedPrice, 
-            image, 
+            image : newImage, 
             stock: parsedStock, 
             userId, 
             categoryId: parsedCategoryId 
@@ -67,20 +70,11 @@ const createProduct = async (req, res, next) => {
     }
 };
 
-
-
-
 const updateProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { name, description, price, image, stock, categoryId } = req.body;
         const userId = req.user.id;
-        // console.log("Request params in updateProduct:", req.params); 
-        // console.log("Request body in updateProduct:", req.body); 
-
-        // if (!name || !description || !price || !image || !stock) {
-        //     return res.status(400).json({ message: 'Please provide all required fields' });
-        // }
 
         const updatedProduct = await putProduct(id, name, description, price, image, stock, categoryId, userId);
 
@@ -101,10 +95,27 @@ const removeProduct = async (req, res, next) => {
     }
 };
 
+const uploadImage = async (req, res) => {
+    try {
+        const file = req.file;
+
+        if (!file) {
+            throw new ErrorHandler(400, "Please provide an image");
+        }
+
+        const imageUrl = `api/uploads/${req.file.filename}`;
+
+        handleSuccess(res, imageUrl, 200, "Image uploaded successfully");
+    } catch (error) {
+        handleError(res, error);
+    }
+};
+
 module.exports = {
     getProducts,
     getProduct,
     createProduct,
     updateProduct,
-    removeProduct
+    removeProduct,
+    uploadImage
 };
