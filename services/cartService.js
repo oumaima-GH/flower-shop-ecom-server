@@ -41,19 +41,62 @@ const addProductToCart = async (userId, productId, quantity) => {
                 },
             });
         } else {
-            await db.cart.create({
+            const newCart = await db.cart.create({
                 data: {
                     userId,
                     productId,
                     quantity,
                 },
+                include: {
+                    product: true,
+                },
             });
+            return newCart; 
         }
+        
+        const updatedCarts = await fetchCarts(userId);
+        return updatedCarts;
     } catch (error) {
-        // console.log("Error in addProductToCart:", error.message);
         throw new ErrorHandler(500, error.message);
     }
-}
+};
+
+
+
+// const addProductToCart = async (userId, productId, quantity) => {
+//     try {
+//         // console.log(`Adding product ${productId} to cart for user ${userId} with quantity ${quantity}`);
+
+//         const cart = await db.cart.findFirst({
+//             where: {
+//                 userId,
+//                 productId,
+//             },
+//         });
+
+//         if (cart) {
+//             await db.cart.update({
+//                 where: {
+//                     id: cart.id,
+//                 },
+//                 data: {
+//                     quantity: cart.quantity + quantity,
+//                 },
+//             });
+//         } else {
+//             await db.cart.create({
+//                 data: {
+//                     userId,
+//                     productId,
+//                     quantity,
+//                 },
+//             });
+//         }
+//     } catch (error) {
+//         // console.log("Error in addProductToCart:", error.message);
+//         throw new ErrorHandler(500, error.message);
+//     }
+// }
 
 const deleteProductFromCart = async (userId, productId) => {
     try {
